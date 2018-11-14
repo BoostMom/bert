@@ -157,22 +157,85 @@ class InputFeatures(object):
 
 class DataProcessor(object):
   """Base class for data converters for sequence classification data sets."""
+  def read_txts_tab(self,data_dir):
+	  fi = open(data_dir,'r')
+	  seqes = list()
+	  for line in fi.readlines():
+		  line = line.strip()
+		  seq = line.split(" ",1)
+		  seqes.append(seq)
+	  return seqes
 
   def get_train_examples(self, data_dir):
-    """Gets a collection of `InputExample`s for the train set."""
-    raise NotImplementedError()
+      """Gets a collection of `InputExample`s for the dev set."""
+      # raise NotImplementedError()
+      """See base class."""
+      lines = self.read_txts_tab(os.path.join(data_dir, "sub_train11.txt"
+                                              ))
+      examples = []
+      for (i, line) in enumerate(lines):
+          if i == 0:
+              continue
+          guid = "dev-%d" % (i)
+          text_a = tokenization.convert_to_unicode(line[1])
+          # text_b = tokenization.convert_to_unicode(line[1])
+          label = tokenization.convert_to_unicode(line[0])
+          if label == tokenization.convert_to_unicode("contradictory"):
+              label = tokenization.convert_to_unicode("contradiction")
+          examples.append(
+              InputExample(guid=guid, text_a=text_a, label=label))
+      return examples
+
+
 
   def get_dev_examples(self, data_dir):
     """Gets a collection of `InputExample`s for the dev set."""
-    raise NotImplementedError()
+    # raise NotImplementedError()
+    """See base class."""
+    lines = self.read_txts_tab(os.path.join(data_dir, "sub_dev11.txt"
+                     ))
+    examples = []
+    for (i, line) in enumerate(lines):
+	    if i == 0:
+	      continue
+	    guid = "dev-%d" % (i)
+	    text_a = tokenization.convert_to_unicode(line[1])
+	    # text_b = tokenization.convert_to_unicode(line[1])
+	    label = tokenization.convert_to_unicode(line[0])
+	    if label == tokenization.convert_to_unicode("contradictory"):
+		    label = tokenization.convert_to_unicode("contradiction")
+	    examples.append(
+		    InputExample(guid=guid, text_a=text_a, label=label))
+    return examples
 
   def get_test_examples(self, data_dir):
     """Gets a collection of `InputExample`s for prediction."""
-    raise NotImplementedError()
+    #
+    """See base class."""
+    lines = self.read_txts_tab(os.path.join(data_dir, "sub_iden11.txt"))
+    examples = []
+    for (i, line) in enumerate(lines):
+	    if i == 0:
+	      continue
+	    guid = "test-%d" % (i)
+	    text_a = tokenization.convert_to_unicode(line[1])
+	    # text_b = tokenization.convert_to_unicode(line[1])
+	    label = tokenization.convert_to_unicode(line[0])
+	    if label == tokenization.convert_to_unicode("contradictory"):
+		    label = tokenization.convert_to_unicode("contradiction")
+	    examples.append(
+		    InputExample(guid=guid, text_a=text_a, label=label))
+    return examples
 
   def get_labels(self):
-    """Gets the list of labels for this data set."""
-    raise NotImplementedError()
+
+      label = [u'陌陌币会员', u'钱包', u'红包', u'陌陌现场', u'动态', u'附近人', u'账号安全', u'IM通讯', u'设置', u'用户处罚', u'虚拟礼物', u'聊天室', u'才艺广场', u'群组', u'好友',
+	   u'其他领域']
+      tf.logging.info("*** labels ***")
+      tf.logging.info(label)
+      return label
+    # """Gets the list of labels for this data set."""
+    # raise NotImplementedError()
 
   @classmethod
   def _read_tsv(cls, input_file, quotechar=None):
@@ -183,7 +246,6 @@ class DataProcessor(object):
       for line in reader:
         lines.append(line)
       return lines
-
 
 class XnliProcessor(DataProcessor):
   """Processor for the XNLI data set."""
